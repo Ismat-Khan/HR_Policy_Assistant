@@ -21,19 +21,22 @@ st.set_page_config(
 
 
 # =========================================================
-# CUSTOM CSS
+# UI STYLING
 # =========================================================
+# IMPORTANT:
+# This UI does NOT use custom HTML div/span elements.
+# Only CSS is used here.
 
 st.markdown(
     """
     <style>
 
-    /* =====================================================
-       GLOBAL APP
-    ===================================================== */
+    /* ================================
+       MAIN APP
+       ================================ */
 
     .stApp {
-        background-color: #f4f7fc;
+        background-color: #f5f7fb;
     }
 
     .main .block-container {
@@ -42,264 +45,73 @@ st.markdown(
         padding-bottom: 3rem;
     }
 
-    /* =====================================================
-       HEADINGS
-    ===================================================== */
+    /* ================================
+       TEXT
+       ================================ */
 
     h1, h2, h3, h4, h5, h6 {
         color: #172033 !important;
     }
 
-    [data-testid="stMarkdownContainer"] p,
-    [data-testid="stMarkdownContainer"] li {
-        color: #172033 !important;
+    p {
+        color: #344054;
     }
 
-
-    /* =====================================================
+    /* ================================
        SIDEBAR
-    ===================================================== */
+       ================================ */
 
     section[data-testid="stSidebar"] {
         background-color: #ffffff !important;
-        border-right: 1px solid #e3e8f2;
+        border-right: 1px solid #e4e7ec;
     }
 
-    section[data-testid="stSidebar"] * {
+    section[data-testid="stSidebar"] p {
+        color: #344054 !important;
+    }
+
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3 {
         color: #172033 !important;
     }
 
-    .sidebar-title {
-        font-size: 24px;
-        font-weight: 800;
-        color: #172033 !important;
-        margin-bottom: 5px;
-    }
-
-    .sidebar-subtitle {
-        color: #667085 !important;
-        font-size: 14px;
-        line-height: 1.5;
-        margin-bottom: 18px;
-    }
-
-
-    /* =====================================================
-       HERO
-    ===================================================== */
-
-    .hero {
-        background: linear-gradient(
-            135deg,
-            #eef4ff 0%,
-            #f8faff 55%,
-            #edf2ff 100%
-        );
-
-        border: 1px solid #dce5f7;
-        border-radius: 24px;
-
-        padding: 30px 34px;
-        margin-bottom: 25px;
-
-        box-shadow: 0 8px 30px rgba(35, 75, 140, 0.06);
-    }
-
-    .hero-badge {
-        display: inline-block;
-        background-color: #e0eaff;
-        color: #2856c5 !important;
-        border-radius: 50px;
-        padding: 6px 13px;
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 12px;
-    }
-
-    .hero-title {
-        font-size: 38px;
-        font-weight: 800;
-        color: #172033 !important;
-        margin: 0;
-    }
-
-    .hero-subtitle {
-        color: #667085 !important;
-        font-size: 16px;
-        line-height: 1.6;
-        margin-top: 8px;
-    }
-
-
-    /* =====================================================
-       UPLOAD CARD
-    ===================================================== */
-
-    .upload-card {
-        background-color: #ffffff;
-        border: 1px solid #dfe6f2;
-        border-radius: 18px;
-        padding: 18px;
-        margin-bottom: 10px;
-        box-shadow: 0 5px 20px rgba(30, 60, 100, 0.04);
-    }
-
-    .upload-title {
-        color: #172033 !important;
-        font-size: 18px;
-        font-weight: 750;
-        margin-bottom: 5px;
-    }
-
-    .upload-description {
-        color: #667085 !important;
-        font-size: 13px;
-    }
-
-
-    /* =====================================================
+    /* ================================
        FILE UPLOADER
-    ===================================================== */
+       ================================ */
 
     [data-testid="stFileUploader"] {
-        background-color: #f7f9fd !important;
-        border: 2px dashed #c9d6ed !important;
+        background-color: #f8faff !important;
+        border: 2px dashed #b9c8e5 !important;
         border-radius: 14px !important;
-        padding: 8px !important;
+        padding: 10px !important;
     }
 
     [data-testid="stFileUploader"] section {
         background-color: transparent !important;
     }
 
-    [data-testid="stFileUploader"] * {
-        color: #344054 !important;
+    [data-testid="stFileUploader"] button {
+        background-color: #315fd3 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
     }
 
-    [data-testid="stFileUploaderDropzone"] {
-        background-color: #f7f9fd !important;
-    }
-
-
-    /* =====================================================
-       RAG PIPELINE
-    ===================================================== */
-
-    .pipeline-card {
-        background-color: #f8faff;
-        border: 1px solid #e1e7f2;
-        border-radius: 16px;
-        padding: 18px;
-    }
-
-    .pipeline-heading {
-        font-size: 17px;
-        font-weight: 800;
-        color: #172033 !important;
-        margin-bottom: 12px;
-    }
-
-    .pipeline-step {
-        background-color: #ffffff;
-        border: 1px solid #e1e7f2;
-        border-radius: 10px;
-        padding: 10px 12px;
-        margin-bottom: 8px;
-    }
-
-    .pipeline-number {
-        color: #315fd3 !important;
-        font-weight: 800;
-        margin-right: 8px;
-    }
-
-    .pipeline-text {
-        color: #344054 !important;
-        font-size: 13px;
-    }
-
-
-    /* =====================================================
-       STAT CARDS
-    ===================================================== */
-
-    .stat-card {
-        background-color: #ffffff;
-        border: 1px solid #e3e8f2;
-        border-radius: 18px;
-        padding: 20px;
-        min-height: 115px;
-        box-shadow: 0 5px 20px rgba(30, 60, 100, 0.04);
-    }
-
-    .stat-icon {
-        font-size: 22px;
-        margin-bottom: 7px;
-    }
-
-    .stat-value {
-        font-size: 26px;
-        font-weight: 800;
-        color: #2856c5 !important;
-    }
-
-    .stat-label {
-        color: #667085 !important;
-        font-size: 13px;
-        margin-top: 3px;
-    }
-
-
-    /* =====================================================
-       POLICY READY
-    ===================================================== */
-
-    .ready-card {
-        background: linear-gradient(
-            135deg,
-            #eef5ff,
-            #f6f9ff
-        );
-
-        border: 1px solid #cddcf5;
-        border-left: 5px solid #3b72df;
-
-        border-radius: 16px;
-
-        padding: 16px 20px;
-        margin: 20px 0;
-    }
-
-    .ready-title {
-        color: #214caa !important;
-        font-weight: 750;
-        font-size: 15px;
-    }
-
-    .ready-text {
-        color: #667085 !important;
-        font-size: 13px;
-        margin-top: 3px;
-    }
-
-
-    /* =====================================================
+    /* ================================
        CHAT INPUT
-    ===================================================== */
+       ================================ */
 
     [data-testid="stChatInput"] {
         background-color: #ffffff !important;
-        border: 1px solid #d7e0ef !important;
-        border-radius: 18px !important;
-        padding: 5px !important;
-        box-shadow: 0 6px 22px rgba(30, 60, 100, 0.08);
+        border: 1px solid #d0d5dd !important;
+        border-radius: 16px !important;
+        box-shadow: 0 5px 20px rgba(16, 24, 40, 0.08) !important;
     }
 
     [data-testid="stChatInput"] textarea {
         background-color: #ffffff !important;
         color: #172033 !important;
-        border: none !important;
-        font-size: 15px !important;
     }
 
     [data-testid="stChatInput"] textarea::placeholder {
@@ -308,130 +120,62 @@ st.markdown(
 
     [data-testid="stChatInput"] button {
         background-color: #315fd3 !important;
-        color: #ffffff !important;
-        border-radius: 12px !important;
+        color: white !important;
+        border-radius: 10px !important;
     }
 
-    [data-testid="stChatInput"] button svg {
-        color: #ffffff !important;
-    }
-
-
-    /* =====================================================
+    /* ================================
        CHAT MESSAGES
-    ===================================================== */
+       ================================ */
 
     [data-testid="stChatMessage"] {
-        background-color: #ffffff !important;
-        border: 1px solid #e3e8f2 !important;
-        border-radius: 16px !important;
-        margin-bottom: 12px !important;
-        padding: 15px !important;
+        border-radius: 14px !important;
+        border: 1px solid #e4e7ec !important;
     }
 
-    [data-testid="stChatMessage"] p,
-    [data-testid="stChatMessage"] li,
-    [data-testid="stChatMessage"] span,
-    [data-testid="stChatMessage"] strong {
-        color: #172033 !important;
-    }
-
-
-    /* =====================================================
-       ANSWER CARD
-    ===================================================== */
-
-    .answer-card {
-        background-color: #ffffff;
-        border: 1px solid #dfe6f2;
-        border-radius: 20px;
-        padding: 24px;
-        margin-top: 10px;
-        box-shadow: 0 8px 28px rgba(30, 60, 100, 0.06);
-    }
-
-    .answer-header {
-        color: #2856c5 !important;
-        font-size: 18px;
-        font-weight: 800;
-        margin-bottom: 12px;
-    }
-
-    .answer-text {
-        color: #172033 !important;
-        font-size: 15px;
-        line-height: 1.75;
-    }
-
-    .answer-text p,
-    .answer-text li,
-    .answer-text strong {
-        color: #172033 !important;
-    }
-
-
-    /* =====================================================
-       SOURCE CARDS
-    ===================================================== */
-
-    .sources-title {
-        color: #172033 !important;
-        font-size: 18px;
-        font-weight: 800;
-        margin-top: 25px;
-        margin-bottom: 12px;
-    }
-
-    .source-card {
-        background-color: #ffffff;
-        border: 1px solid #e1e7f0;
-        border-radius: 14px;
-        padding: 15px 18px;
-        margin-bottom: 10px;
-    }
-
-    .source-page {
-        color: #2856c5 !important;
-        font-size: 13px;
-        font-weight: 750;
-    }
-
-    .source-text {
-        color: #667085 !important;
-        font-size: 13px;
-        line-height: 1.5;
-        margin-top: 5px;
-    }
-
-
-    /* =====================================================
+    /* ================================
        BUTTONS
-    ===================================================== */
+       ================================ */
 
     .stButton > button {
+        border-radius: 10px !important;
+        border: 1px solid #cfd8ea !important;
         background-color: #eef3ff !important;
         color: #2856c5 !important;
-        border: 1px solid #ccd9f3 !important;
-        border-radius: 10px !important;
-        font-weight: 650 !important;
+        font-weight: 600 !important;
     }
 
     .stButton > button:hover {
-        background-color: #e1eaff !important;
-        border-color: #b7c9eb !important;
+        background-color: #e0e9ff !important;
+        border-color: #9fb5e5 !important;
     }
 
+    /* ================================
+       METRICS
+       ================================ */
 
-    /* =====================================================
+    [data-testid="stMetric"] {
+        background-color: #ffffff;
+        border: 1px solid #e4e7ec;
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 4px 15px rgba(16, 24, 40, 0.04);
+    }
+
+    [data-testid="stMetricLabel"] {
+        color: #667085 !important;
+    }
+
+    [data-testid="stMetricValue"] {
+        color: #315fd3 !important;
+    }
+
+    /* ================================
        ALERTS
-    ===================================================== */
+       ================================ */
 
     [data-testid="stAlert"] {
         border-radius: 12px !important;
-    }
-
-    [data-testid="stAlert"] p {
-        color: #172033 !important;
     }
 
     </style>
@@ -458,7 +202,7 @@ if "messages" not in st.session_state:
 
 
 # =========================================================
-# LOAD SENTENCE TRANSFORMER
+# EMBEDDING MODEL
 # =========================================================
 
 @st.cache_resource
@@ -497,7 +241,7 @@ def get_groq_client():
 
 
 # =========================================================
-# EXTRACT TEXT FROM PDF
+# PDF TEXT EXTRACTION
 # =========================================================
 
 def extract_pdf_text(pdf_bytes):
@@ -531,7 +275,7 @@ def extract_pdf_text(pdf_bytes):
 
 
 # =========================================================
-# CREATE TEXT CHUNKS
+# CREATE CHUNKS
 # =========================================================
 
 def create_chunks(
@@ -762,115 +506,52 @@ Answer using only the provided HR policy context.
 
 with st.sidebar:
 
-    st.markdown(
-        """
-        <div class="sidebar-title">
-            📄 HR Document
-        </div>
+    st.title("📄 HR Document")
 
-        <div class="sidebar-subtitle">
-            Upload your organization's HR policy
-            to begin.
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.caption(
+        "Upload your organization's HR policy "
+        "to begin."
     )
 
-    st.markdown(
-        """
-        <div class="upload-card">
-
-            <div class="upload-title">
-                📤 Upload Policy
-            </div>
-
-            <div class="upload-description">
-                PDF files only
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.subheader("📤 Upload Policy")
 
     uploaded_file = st.file_uploader(
-        "Upload HR Policy PDF",
+        "Choose an HR policy PDF",
         type=["pdf"],
-        label_visibility="collapsed",
+        help="Upload a text-based HR policy PDF.",
     )
 
-    st.markdown("---")
+    st.divider()
+
+    st.subheader("🔎 RAG Pipeline")
 
     st.markdown(
-        """
-        <div class="pipeline-card">
+        "🟦 **01 — PDF Upload**"
+    )
 
-            <div class="pipeline-heading">
-                🔎 RAG Pipeline
-            </div>
+    st.markdown(
+        "🟦 **02 — PyMuPDF Extraction**"
+    )
 
-            <div class="pipeline-step">
-                <span class="pipeline-number">
-                    01
-                </span>
-                <span class="pipeline-text">
-                    PDF Upload
-                </span>
-            </div>
+    st.markdown(
+        "🟦 **03 — Text Chunking**"
+    )
 
-            <div class="pipeline-step">
-                <span class="pipeline-number">
-                    02
-                </span>
-                <span class="pipeline-text">
-                    PyMuPDF Extraction
-                </span>
-            </div>
+    st.markdown(
+        "🟦 **04 — Sentence Transformers**"
+    )
 
-            <div class="pipeline-step">
-                <span class="pipeline-number">
-                    03
-                </span>
-                <span class="pipeline-text">
-                    Text Chunking
-                </span>
-            </div>
+    st.markdown(
+        "🟦 **05 — FAISS Retrieval**"
+    )
 
-            <div class="pipeline-step">
-                <span class="pipeline-number">
-                    04
-                </span>
-                <span class="pipeline-text">
-                    Sentence Transformers
-                </span>
-            </div>
-
-            <div class="pipeline-step">
-                <span class="pipeline-number">
-                    05
-                </span>
-                <span class="pipeline-text">
-                    FAISS Retrieval
-                </span>
-            </div>
-
-            <div class="pipeline-step">
-                <span class="pipeline-number">
-                    06
-                </span>
-                <span class="pipeline-text">
-                    Groq Generation
-                </span>
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.markdown(
+        "🟦 **06 — Groq Generation**"
     )
 
     if st.session_state.document_name:
 
-        st.markdown("---")
+        st.divider()
 
         st.success(
             f"📄 {st.session_state.document_name}"
@@ -895,35 +576,28 @@ with st.sidebar:
 
 
 # =========================================================
-# HERO HEADER
+# MAIN HEADER
 # =========================================================
 
-st.markdown(
-    """
-    <div class="hero">
-
-        <div class="hero-badge">
-            AI-POWERED HR KNOWLEDGE
-        </div>
-
-        <div class="hero-title">
-            📋 HR Policy Assistant
-        </div>
-
-        <div class="hero-subtitle">
-            Upload an HR policy document and ask questions
-            in natural language. RAG retrieves relevant
-            policy sections before generating the answer.
-        </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True,
+st.title(
+    "📋 HR Policy Assistant"
 )
 
+st.caption(
+    "AI-powered document question answering "
+    "using Retrieval-Augmented Generation (RAG)."
+)
+
+st.markdown(
+    "Upload an HR policy PDF and ask questions "
+    "about its contents in natural language."
+)
+
+st.divider()
+
 
 # =========================================================
-# PROCESS UPLOADED PDF
+# PROCESS PDF
 # =========================================================
 
 if uploaded_file is not None:
@@ -933,9 +607,14 @@ if uploaded_file is not None:
         != uploaded_file.name
     ):
 
-        with st.spinner(
-            "📖 Reading HR policy..."
+        with st.status(
+            "Processing HR policy...",
+            expanded=True
         ):
+
+            st.write(
+                "📖 Extracting text with PyMuPDF..."
+            )
 
             pdf_bytes = (
                 uploaded_file.getvalue()
@@ -945,35 +624,49 @@ if uploaded_file is not None:
                 pdf_bytes
             )
 
-        if not pages:
+            if not pages:
 
-            st.error(
-                "No readable text was found "
-                "in this PDF. Please upload a "
-                "text-based PDF."
+                st.error(
+                    "No readable text was found "
+                    "in this PDF. Please upload a "
+                    "text-based PDF."
+                )
+
+                st.stop()
+
+            st.write(
+                f"✓ Extracted {len(pages)} pages"
             )
 
-            st.stop()
-
-        with st.spinner(
-            "✂️ Creating policy chunks..."
-        ):
+            st.write(
+                "✂️ Creating text chunks..."
+            )
 
             chunks = create_chunks(
                 pages
             )
 
-        with st.spinner(
-            "🧠 Building FAISS search index..."
-        ):
+            st.write(
+                f"✓ Created {len(chunks)} chunks"
+            )
 
-            model = (
-                load_embedding_model()
+            st.write(
+                "🧠 Creating Sentence Transformer embeddings..."
+            )
+
+            model = load_embedding_model()
+
+            st.write(
+                "🔎 Building FAISS vector index..."
             )
 
             index = create_faiss_index(
                 chunks,
                 model
+            )
+
+            st.write(
+                "✓ FAISS index ready"
             )
 
         st.session_state.chunks = chunks
@@ -987,7 +680,7 @@ if uploaded_file is not None:
         st.session_state.messages = []
 
         st.success(
-            "✅ Policy uploaded and ready!"
+            "✅ HR policy uploaded and indexed successfully!"
         )
 
 
@@ -997,94 +690,45 @@ if uploaded_file is not None:
 
 if st.session_state.index is not None:
 
+    st.subheader(
+        "📊 Document Overview"
+    )
+
     col1, col2, col3 = st.columns(3)
 
     with col1:
 
-        st.markdown(
-            f"""
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    📄
-                </div>
-
-                <div class="stat-value">
-                    {len(st.session_state.chunks)}
-                </div>
-
-                <div class="stat-label">
-                    Policy Chunks
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
+        st.metric(
+            label="📄 Policy Chunks",
+            value=len(
+                st.session_state.chunks
+            ),
         )
 
     with col2:
 
-        st.markdown(
-            """
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    🔎
-                </div>
-
-                <div class="stat-value">
-                    FAISS
-                </div>
-
-                <div class="stat-label">
-                    Vector Search
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
+        st.metric(
+            label="🔎 Vector Search",
+            value="FAISS",
         )
 
     with col3:
 
-        st.markdown(
-            """
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    🤖
-                </div>
-
-                <div class="stat-value">
-                    RAG
-                </div>
-
-                <div class="stat-label">
-                    AI Answer Generation
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
+        st.metric(
+            label="🤖 Answer Generation",
+            value="RAG",
         )
 
-    st.markdown(
-        """
-        <div class="ready-card">
+    st.success(
+        "✓ Policy Ready — "
+        "Ask a question about the uploaded HR policy below."
+    )
 
-            <div class="ready-title">
-                ✓ Policy Ready
-            </div>
+else:
 
-            <div class="ready-text">
-                Your document has been indexed.
-                Ask a question below to retrieve
-                relevant HR policy information.
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.info(
+        "📤 Upload an HR policy PDF from the sidebar "
+        "to start asking questions."
     )
 
 
@@ -1107,14 +751,7 @@ for message in st.session_state.messages:
 # QUESTION INPUT
 # =========================================================
 
-if st.session_state.index is None:
-
-    st.info(
-        "📤 Upload an HR policy PDF from the "
-        "sidebar to start asking questions."
-    )
-
-else:
+if st.session_state.index is not None:
 
     question = st.chat_input(
         "Ask something about the HR policy..."
@@ -1142,7 +779,7 @@ else:
                 )
 
                 with st.spinner(
-                    "🔎 Searching policy..."
+                    "🔎 Searching the HR policy..."
                 ):
 
                     retrieved_chunks = (
@@ -1168,32 +805,22 @@ else:
                 # ANSWER
                 # =========================================
 
-                st.markdown(
-                    """
-                    <div class="answer-card">
-
-                        <div class="answer-header">
-                            🤖 AI Answer
-                        </div>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
+                st.subheader(
+                    "🤖 AI Answer"
                 )
 
-                st.markdown(answer)
+                st.markdown(
+                    answer
+                )
 
                 # =========================================
                 # SOURCES
                 # =========================================
 
-                st.markdown(
-                    """
-                    <div class="sources-title">
-                        📚 Retrieved Sources
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
+                st.divider()
+
+                st.subheader(
+                    "📚 Retrieved Sources"
                 )
 
                 seen_pages = set()
@@ -1207,26 +834,22 @@ else:
 
                     seen_pages.add(page)
 
-                    preview = html.escape(
+                    preview = (
                         source["text"][:350]
+                        .replace("\n", " ")
                     )
 
-                    st.markdown(
-                        f"""
-                        <div class="source-card">
+                    with st.container(
+                        border=True
+                    ):
 
-                            <div class="source-page">
-                                📄 Policy Page {page}
-                            </div>
+                        st.markdown(
+                            f"**📄 Policy Page {page}**"
+                        )
 
-                            <div class="source-text">
-                                {preview}...
-                            </div>
-
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
+                        st.caption(
+                            preview + "..."
+                        )
 
                 st.session_state.messages.append(
                     {
@@ -1238,6 +861,9 @@ else:
             except Exception as error:
 
                 st.error(
-                    f"Something went wrong:\n\n"
-                    f"{error}"
+                    "Something went wrong:"
+                )
+
+                st.code(
+                    str(error)
                 )
