@@ -2,8 +2,7 @@ import os
 import html
 
 import faiss
-import fitz  # PyMuPDF
-import numpy as np
+import fitz
 import streamlit as st
 from sentence_transformers import SentenceTransformer
 from groq import Groq
@@ -29,255 +28,400 @@ st.markdown(
     """
     <style>
 
-        /* =========================
-           MAIN APP
-        ========================= */
+    /* =====================================================
+       GLOBAL
+    ===================================================== */
 
-        .stApp {
-            background-color: #f7f9fc;
-            color: #172033;
-        }
+    .stApp {
+        background: #f4f7fc;
+    }
 
-        /* =========================
-           HEADINGS
-        ========================= */
+    .main .block-container {
+        max-width: 1250px;
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+    }
 
-        h1, h2, h3, h4, h5, h6 {
-            color: #172033 !important;
-        }
+    /* Remove excessive Streamlit spacing */
+    [data-testid="stVerticalBlock"] {
+        gap: 0.6rem;
+    }
 
-        /* =========================
-           MAIN TITLE
-        ========================= */
+    /* =====================================================
+       SIDEBAR
+    ===================================================== */
 
-        .main-title {
-            font-size: 42px;
-            font-weight: 800;
-            color: #172033 !important;
-            margin-bottom: 5px;
-        }
+    section[data-testid="stSidebar"] {
+        background: #ffffff !important;
+        border-right: 1px solid #e3e8f2;
+    }
 
-        .subtitle {
-            color: #667085 !important;
-            font-size: 17px;
-            margin-bottom: 25px;
-        }
+    section[data-testid="stSidebar"] * {
+        color: #172033 !important;
+    }
 
-        /* =========================
-           GENERAL MARKDOWN
-        ========================= */
+    section[data-testid="stSidebar"] .stMarkdown {
+        color: #172033 !important;
+    }
 
-        [data-testid="stMarkdownContainer"] p {
-            color: #172033 !important;
-        }
+    /* Sidebar title */
+    .sidebar-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: #172033 !important;
+        margin-bottom: 5px;
+    }
 
-        [data-testid="stMarkdownContainer"] li {
-            color: #172033 !important;
-        }
+    .sidebar-subtitle {
+        color: #667085 !important;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
 
-        [data-testid="stMarkdownContainer"] strong {
-            color: #172033 !important;
-        }
+    /* =====================================================
+       HEADER
+    ===================================================== */
 
-        [data-testid="stMarkdownContainer"] em {
-            color: #172033 !important;
-        }
+    .hero {
+        background: linear-gradient(
+            135deg,
+            #eef4ff 0%,
+            #f8faff 55%,
+            #edf2ff 100%
+        );
 
-        /* =========================
-           CHAT MESSAGES
-        ========================= */
+        border: 1px solid #dce5f7;
+        border-radius: 24px;
 
-        [data-testid="stChatMessage"] {
-            color: #172033 !important;
-        }
+        padding: 30px 34px;
+        margin-bottom: 25px;
 
-        [data-testid="stChatMessage"] p {
-            color: #172033 !important;
-        }
+        box-shadow: 0 8px 30px rgba(35, 75, 140, 0.06);
+    }
 
-        [data-testid="stChatMessage"] li {
-            color: #172033 !important;
-        }
+    .hero-title {
+        font-size: 38px;
+        font-weight: 800;
+        color: #172033 !important;
+        margin: 0;
+    }
 
-        [data-testid="stChatMessage"] strong {
-            color: #172033 !important;
-        }
+    .hero-subtitle {
+        color: #667085 !important;
+        font-size: 16px;
+        margin-top: 8px;
+        line-height: 1.6;
+    }
 
-        [data-testid="stChatMessage"] code {
-            color: #172033 !important;
-        }
+    .hero-badge {
+        display: inline-block;
+        background: #e0eaff;
+        color: #2856c5 !important;
+        border-radius: 50px;
+        padding: 6px 13px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
 
-        /* =========================
-           STATUS CARD
-        ========================= */
+    /* =====================================================
+       STAT CARDS
+    ===================================================== */
 
-        .status-card {
-            background-color: #eef7ff;
-            color: #172033 !important;
-            border-left: 5px solid #2563eb;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e3e8f2;
+        border-radius: 18px;
+        padding: 20px;
+        min-height: 115px;
+        box-shadow: 0 5px 20px rgba(30, 60, 100, 0.04);
+    }
 
-        .status-card b {
-            color: #172033 !important;
-        }
+    .stat-icon {
+        font-size: 22px;
+        margin-bottom: 7px;
+    }
 
-        /* =========================
-           SOURCE CARD
-        ========================= */
+    .stat-value {
+        font-size: 26px;
+        font-weight: 800;
+        color: #2856c5 !important;
+    }
 
-        .source-card {
-            background-color: #ffffff;
-            color: #172033 !important;
-            border: 1px solid #e4e7ec;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 10px;
-        }
+    .stat-label {
+        color: #667085 !important;
+        font-size: 13px;
+        margin-top: 3px;
+    }
 
-        .source-card b {
-            color: #172033 !important;
-        }
+    /* =====================================================
+       UPLOAD AREA
+    ===================================================== */
 
-        .source-card span {
-            color: #667085 !important;
-        }
+    .upload-card {
+        background: #ffffff;
+        border: 1px solid #dfe6f2;
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 20px rgba(30, 60, 100, 0.04);
+    }
 
-        /* =========================
-           METRIC CARDS
-        ========================= */
+    .upload-title {
+        color: #172033 !important;
+        font-size: 18px;
+        font-weight: 750;
+        margin-bottom: 5px;
+    }
 
-        .metric-card {
-            background-color: #ffffff;
-            color: #172033 !important;
-            border: 1px solid #e4e7ec;
-            border-radius: 14px;
-            padding: 18px;
-            text-align: center;
-        }
+    .upload-description {
+        color: #667085 !important;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
 
-        .metric-number {
-            font-size: 28px;
-            font-weight: 800;
-            color: #2563eb !important;
-        }
+    /* Streamlit uploader */
+    [data-testid="stFileUploader"] {
+        background: #f7f9fd !important;
+        border: 2px dashed #c9d6ed !important;
+        border-radius: 14px !important;
+        padding: 8px !important;
+    }
 
-        .metric-label {
-            color: #667085 !important;
-            font-size: 14px;
-        }
+    [data-testid="stFileUploader"] section {
+        background: transparent !important;
+    }
 
-        /* =========================
-           FILE UPLOADER
-        ========================= */
+    [data-testid="stFileUploader"] * {
+        color: #344054 !important;
+    }
 
-        div[data-testid="stFileUploader"] {
-            background-color: #ffffff;
-            color: #172033 !important;
-            border-radius: 14px;
-            padding: 10px;
-        }
+    [data-testid="stFileUploaderDropzone"] {
+        background: #f7f9fd !important;
+    }
 
-        div[data-testid="stFileUploader"] * {
-            color: #172033 !important;
-        }
+    /* =====================================================
+       POLICY READY
+    ===================================================== */
 
-        /* =========================
-           SIDEBAR
-        ========================= */
+    .ready-card {
+        background: linear-gradient(
+            135deg,
+            #eef5ff,
+            #f6f9ff
+        );
 
-        section[data-testid="stSidebar"] {
-            background-color: #ffffff;
-        }
+        border: 1px solid #cddcf5;
+        border-left: 5px solid #3b72df;
 
-        section[data-testid="stSidebar"] h1,
-        section[data-testid="stSidebar"] h2,
-        section[data-testid="stSidebar"] h3,
-        section[data-testid="stSidebar"] h4 {
-            color: #172033 !important;
-        }
+        border-radius: 16px;
 
-        section[data-testid="stSidebar"] p {
-            color: #172033 !important;
-        }
+        padding: 16px 20px;
+        margin: 20px 0;
+    }
 
-        section[data-testid="stSidebar"] span {
-            color: #172033 !important;
-        }
+    .ready-title {
+        color: #214caa !important;
+        font-weight: 750;
+        font-size: 15px;
+    }
 
-        section[data-testid="stSidebar"] label {
-            color: #172033 !important;
-        }
+    .ready-text {
+        color: #667085 !important;
+        font-size: 13px;
+        margin-top: 3px;
+    }
 
-        section[data-testid="stSidebar"] button {
-            color: #172033 !important;
-        }
+    /* =====================================================
+       CHAT AREA
+    ===================================================== */
 
-        /* =========================
-           INPUTS
-        ========================= */
+    /* Chat input container */
+    [data-testid="stChatInput"] {
+        background: #ffffff !important;
+        border: 1px solid #d7e0ef !important;
+        border-radius: 18px !important;
+        padding: 5px !important;
+        box-shadow: 0 6px 22px rgba(30, 60, 100, 0.08);
+    }
 
-        input {
-            color: #172033 !important;
-            background-color: #ffffff !important;
-        }
+    [data-testid="stChatInput"] textarea {
+        background: #ffffff !important;
+        color: #172033 !important;
+        border: none !important;
+        font-size: 15px !important;
+    }
 
-        textarea {
-            color: #172033 !important;
-            background-color: #ffffff !important;
-        }
+    [data-testid="stChatInput"] textarea::placeholder {
+        color: #98a2b3 !important;
+    }
 
-        /* =========================
-           BUTTONS
-        ========================= */
+    [data-testid="stChatInput"] button {
+        background: #315fd3 !important;
+        color: #ffffff !important;
+        border-radius: 12px !important;
+    }
 
-        button {
-            color: #172033 !important;
-        }
+    [data-testid="stChatInput"] button svg {
+        color: #ffffff !important;
+    }
 
-        /* =========================
-           INFO / SUCCESS / ERROR
-        ========================= */
+    /* =====================================================
+       CHAT MESSAGES
+    ===================================================== */
 
-        [data-testid="stAlert"] {
-            color: #172033 !important;
-        }
+    [data-testid="stChatMessage"] {
+        background: #ffffff !important;
+        border: 1px solid #e3e8f2 !important;
+        border-radius: 16px !important;
+        margin-bottom: 12px !important;
+        padding: 15px !important;
+    }
 
-        [data-testid="stAlert"] p {
-            color: #172033 !important;
-        }
+    [data-testid="stChatMessage"] p,
+    [data-testid="stChatMessage"] li,
+    [data-testid="stChatMessage"] span,
+    [data-testid="stChatMessage"] strong {
+        color: #172033 !important;
+    }
 
-        /* =========================
-           CODE BLOCKS
-        ========================= */
+    /* =====================================================
+       ANSWER CARD
+    ===================================================== */
 
-        pre {
-            color: #172033 !important;
-        }
+    .answer-card {
+        background: #ffffff;
+        border: 1px solid #dfe6f2;
+        border-radius: 20px;
+        padding: 24px;
+        margin-top: 10px;
+        box-shadow: 0 8px 28px rgba(30, 60, 100, 0.06);
+    }
+
+    .answer-header {
+        color: #2856c5 !important;
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .answer-text {
+        color: #172033 !important;
+        font-size: 15px;
+        line-height: 1.75;
+    }
+
+    .answer-text p,
+    .answer-text li,
+    .answer-text strong {
+        color: #172033 !important;
+    }
+
+    /* =====================================================
+       SOURCES
+    ===================================================== */
+
+    .sources-title {
+        color: #172033 !important;
+        font-size: 18px;
+        font-weight: 800;
+        margin-top: 25px;
+        margin-bottom: 12px;
+    }
+
+    .source-card {
+        background: #ffffff;
+        border: 1px solid #e1e7f0;
+        border-radius: 14px;
+        padding: 15px 18px;
+        margin-bottom: 10px;
+    }
+
+    .source-page {
+        color: #2856c5 !important;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .source-text {
+        color: #667085 !important;
+        font-size: 13px;
+        line-height: 1.5;
+        margin-top: 5px;
+    }
+
+    /* =====================================================
+       PIPELINE
+    ===================================================== */
+
+    .pipeline-card {
+        background: #f8faff;
+        border: 1px solid #e1e7f2;
+        border-radius: 16px;
+        padding: 18px;
+    }
+
+    .pipeline-step {
+        background: #ffffff;
+        border: 1px solid #e4e9f2;
+        border-radius: 10px;
+        padding: 9px 11px;
+        margin-bottom: 8px;
+    }
+
+    .pipeline-number {
+        color: #315fd3 !important;
+        font-weight: 800;
+    }
+
+    .pipeline-text {
+        color: #344054 !important;
+        font-size: 13px;
+    }
+
+    /* =====================================================
+       BUTTONS
+    ===================================================== */
+
+    .stButton > button {
+        background: #eef3ff !important;
+        color: #2856c5 !important;
+        border: 1px solid #ccd9f3 !important;
+        border-radius: 10px !important;
+        font-weight: 650 !important;
+    }
+
+    .stButton > button:hover {
+        background: #e1eaff !important;
+        border-color: #b7c9eb !important;
+    }
+
+    /* =====================================================
+       INFO / SUCCESS / ERROR
+    ===================================================== */
+
+    [data-testid="stAlert"] {
+        border-radius: 12px !important;
+    }
+
+    [data-testid="stAlert"] p {
+        color: #172033 !important;
+    }
+
+    /* =====================================================
+       GENERAL TEXT
+    ===================================================== */
+
+    h1, h2, h3, h4, h5, h6 {
+        color: #172033 !important;
+    }
+
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li {
+        color: #172033 !important;
+    }
 
     </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# =========================================================
-# TITLE
-# =========================================================
-
-st.markdown(
-    '<div class="main-title">📋 HR Policy Assistant</div>',
-    unsafe_allow_html=True,
-)
-
-st.markdown(
-    """
-    <div class="subtitle">
-        Upload an HR policy PDF and ask questions using
-        Retrieval-Augmented Generation (RAG).
-    </div>
     """,
     unsafe_allow_html=True,
 )
@@ -301,7 +445,7 @@ if "messages" not in st.session_state:
 
 
 # =========================================================
-# LOAD EMBEDDING MODEL
+# EMBEDDING MODEL
 # =========================================================
 
 @st.cache_resource
@@ -332,7 +476,7 @@ def get_groq_client():
 
 
 # =========================================================
-# EXTRACT PDF TEXT
+# PDF TEXT EXTRACTION
 # =========================================================
 
 def extract_pdf_text(pdf_bytes):
@@ -366,7 +510,7 @@ def extract_pdf_text(pdf_bytes):
 
 
 # =========================================================
-# CREATE CHUNKS
+# CHUNKING
 # =========================================================
 
 def create_chunks(
@@ -394,13 +538,9 @@ def create_chunks(
 
             if chunk_words:
 
-                chunk_text = " ".join(
-                    chunk_words
-                )
-
                 chunks.append(
                     {
-                        "text": chunk_text,
+                        "text": " ".join(chunk_words),
                         "page": page_number,
                     }
                 )
@@ -414,13 +554,10 @@ def create_chunks(
 
 
 # =========================================================
-# CREATE FAISS INDEX
+# FAISS INDEX
 # =========================================================
 
-def create_faiss_index(
-    chunks,
-    model
-):
+def create_faiss_index(chunks, model):
 
     texts = [
         chunk["text"]
@@ -434,14 +571,10 @@ def create_faiss_index(
         show_progress_bar=False,
     )
 
-    embeddings = embeddings.astype(
-        "float32"
-    )
-
-    dimension = embeddings.shape[1]
+    embeddings = embeddings.astype("float32")
 
     index = faiss.IndexFlatIP(
-        dimension
+        embeddings.shape[1]
     )
 
     index.add(embeddings)
@@ -450,7 +583,7 @@ def create_faiss_index(
 
 
 # =========================================================
-# RETRIEVE RELEVANT CHUNKS
+# RETRIEVAL
 # =========================================================
 
 def retrieve_chunks(
@@ -473,23 +606,23 @@ def retrieve_chunks(
 
     scores, indices = index.search(
         question_embedding,
-        min(top_k, len(chunks)),
+        min(top_k, len(chunks))
     )
 
     results = []
 
-    for score, index_position in zip(
+    for score, position in zip(
         scores[0],
         indices[0]
     ):
 
-        if index_position == -1:
+        if position == -1:
             continue
 
         results.append(
             {
-                "text": chunks[index_position]["text"],
-                "page": chunks[index_position]["page"],
+                "text": chunks[position]["text"],
+                "page": chunks[position]["page"],
                 "score": float(score),
             }
         )
@@ -498,7 +631,7 @@ def retrieve_chunks(
 
 
 # =========================================================
-# ASK GROQ
+# GROQ ANSWER
 # =========================================================
 
 def ask_groq(
@@ -515,17 +648,11 @@ def ask_groq(
             "Please add it to Streamlit Secrets."
         )
 
-    context_parts = []
-
-    for item in retrieved_chunks:
-
-        context_parts.append(
-            f"[Page {item['page']}]\n"
-            f"{item['text']}"
-        )
-
     context = "\n\n".join(
-        context_parts
+        [
+            f"[Page {item['page']}]\n{item['text']}"
+            for item in retrieved_chunks
+        ]
     )
 
     system_prompt = """
@@ -535,18 +662,14 @@ Answer the user's question using ONLY
 the HR policy context provided.
 
 Rules:
-
-1. Do not invent HR policies.
-2. Do not use outside information.
-3. If the answer is not present in the
-   provided context, clearly say that the
-   uploaded policy does not contain enough
-   information to answer the question.
-4. Keep the answer clear and professional.
-5. Mention the relevant policy page when
-   possible.
-6. Do not make assumptions.
-7. Do not provide legal advice.
+- Do not invent policies.
+- Do not use outside information.
+- If the answer is not found in the context,
+  say that the uploaded policy does not contain
+  enough information.
+- Keep the response clear and professional.
+- Mention the relevant page when possible.
+- Do not provide legal advice.
 """
 
     user_prompt = f"""
@@ -558,14 +681,11 @@ USER QUESTION:
 
 {question}
 
-Answer the question using only the
-provided HR policy context.
+Answer using only the provided policy context.
 """
 
     response = client.chat.completions.create(
-
         model="openai/gpt-oss-120b",
-
         messages=[
             {
                 "role": "system",
@@ -576,7 +696,6 @@ provided HR policy context.
                 "content": user_prompt,
             },
         ],
-
         temperature=0.1,
     )
 
@@ -589,52 +708,116 @@ provided HR policy context.
 
 with st.sidebar:
 
-    st.markdown("## 📄 Document")
+    st.markdown(
+        """
+        <div class="sidebar-title">
+            📄 HR Document
+        </div>
+
+        <div class="sidebar-subtitle">
+            Upload your organization's HR policy
+            to begin.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div class="upload-card">
+
+            <div class="upload-title">
+                📤 Upload Policy
+            </div>
+
+            <div class="upload-description">
+                PDF files only
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     uploaded_file = st.file_uploader(
         "Upload HR Policy PDF",
         type=["pdf"],
-        help="Upload a text-based HR policy PDF.",
+        label_visibility="collapsed",
     )
 
     st.markdown("---")
-
-    st.markdown("### 🔎 RAG Pipeline")
 
     st.markdown(
         """
-        **1. Upload**  
-        HR policy PDF
+        <div class="pipeline-card">
 
-        **2. Extract**  
-        PyMuPDF
+            <div style="
+                font-size:17px;
+                font-weight:800;
+                color:#172033;
+                margin-bottom:12px;
+            ">
+                🔎 RAG Pipeline
+            </div>
 
-        **3. Chunk**  
-        Split policy text
+            <div class="pipeline-step">
+                <span class="pipeline-number">01</span>
+                <span class="pipeline-text">
+                    &nbsp; PDF Upload
+                </span>
+            </div>
 
-        **4. Embed**  
-        Sentence Transformers
+            <div class="pipeline-step">
+                <span class="pipeline-number">02</span>
+                <span class="pipeline-text">
+                    &nbsp; PyMuPDF Extraction
+                </span>
+            </div>
 
-        **5. Search**  
-        FAISS similarity search
+            <div class="pipeline-step">
+                <span class="pipeline-number">03</span>
+                <span class="pipeline-text">
+                    &nbsp; Text Chunking
+                </span>
+            </div>
 
-        **6. Generate**  
-        Groq LLM
-        """
+            <div class="pipeline-step">
+                <span class="pipeline-number">04</span>
+                <span class="pipeline-text">
+                    &nbsp; Sentence Transformers
+                </span>
+            </div>
+
+            <div class="pipeline-step">
+                <span class="pipeline-number">05</span>
+                <span class="pipeline-text">
+                    &nbsp; FAISS Retrieval
+                </span>
+            </div>
+
+            <div class="pipeline-step">
+                <span class="pipeline-number">06</span>
+                <span class="pipeline-text">
+                    &nbsp; Groq Generation
+                </span>
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-
-    st.markdown("---")
 
     if st.session_state.document_name:
 
+        st.markdown("---")
+
         st.success(
-            f"Loaded:\n\n"
-            f"{st.session_state.document_name}"
+            f"📄 {st.session_state.document_name}"
         )
 
         st.caption(
-            f"Chunks: "
-            f"{len(st.session_state.chunks)}"
+            f"{len(st.session_state.chunks)} "
+            "policy chunks indexed"
         )
 
         if st.button(
@@ -651,6 +834,34 @@ with st.sidebar:
 
 
 # =========================================================
+# HERO HEADER
+# =========================================================
+
+st.markdown(
+    """
+    <div class="hero">
+
+        <div class="hero-badge">
+            AI-POWERED HR KNOWLEDGE
+        </div>
+
+        <div class="hero-title">
+            📋 HR Policy Assistant
+        </div>
+
+        <div class="hero-subtitle">
+            Upload an HR policy document and ask questions
+            in natural language. RAG retrieves relevant
+            policy sections before generating the answer.
+        </div>
+
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# =========================================================
 # PROCESS PDF
 # =========================================================
 
@@ -662,7 +873,7 @@ if uploaded_file is not None:
     ):
 
         with st.spinner(
-            "📖 Reading HR policy PDF..."
+            "📖 Reading HR policy..."
         ):
 
             pdf_bytes = (
@@ -676,8 +887,8 @@ if uploaded_file is not None:
         if not pages:
 
             st.error(
-                "No readable text was found "
-                "in this PDF. Please upload a "
+                "No readable text was found in "
+                "this PDF. Please upload a "
                 "text-based PDF."
             )
 
@@ -692,44 +903,33 @@ if uploaded_file is not None:
             )
 
         with st.spinner(
-            "🧠 Creating embeddings and "
-            "FAISS index..."
+            "🧠 Building FAISS search index..."
         ):
 
-            embedding_model = (
-                load_embedding_model()
-            )
+            model = load_embedding_model()
 
             index = create_faiss_index(
                 chunks,
-                embedding_model
+                model
             )
 
         st.session_state.chunks = chunks
-
         st.session_state.index = index
-
         st.session_state.document_name = (
             uploaded_file.name
         )
-
         st.session_state.messages = []
 
         st.success(
-            f"✅ {uploaded_file.name} "
-            "is ready for questions!"
+            "✅ Policy uploaded and ready!"
         )
 
 
 # =========================================================
-# DOCUMENT STATUS
+# DOCUMENT READY
 # =========================================================
 
 if st.session_state.index is not None:
-
-    chunks_count = len(
-        st.session_state.chunks
-    )
 
     col1, col2, col3 = st.columns(3)
 
@@ -737,13 +937,18 @@ if st.session_state.index is not None:
 
         st.markdown(
             f"""
-            <div class="metric-card">
-                <div class="metric-number">
-                    {chunks_count}
+            <div class="stat-card">
+
+                <div class="stat-icon">📄</div>
+
+                <div class="stat-value">
+                    {len(st.session_state.chunks)}
                 </div>
-                <div class="metric-label">
+
+                <div class="stat-label">
                     Policy Chunks
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True,
@@ -753,13 +958,18 @@ if st.session_state.index is not None:
 
         st.markdown(
             """
-            <div class="metric-card">
-                <div class="metric-number">
+            <div class="stat-card">
+
+                <div class="stat-icon">🔎</div>
+
+                <div class="stat-value">
                     FAISS
                 </div>
-                <div class="metric-label">
+
+                <div class="stat-label">
                     Vector Search
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True,
@@ -769,26 +979,37 @@ if st.session_state.index is not None:
 
         st.markdown(
             """
-            <div class="metric-card">
-                <div class="metric-number">
+            <div class="stat-card">
+
+                <div class="stat-icon">🤖</div>
+
+                <div class="stat-value">
                     RAG
                 </div>
-                <div class="metric-label">
-                    Answer Generation
+
+                <div class="stat-label">
+                    AI Answer Generation
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-    st.markdown("")
-
     st.markdown(
         """
-        <div class="status-card">
-            <b>✅ Policy Ready</b><br>
-            Ask questions about the uploaded
-            HR policy below.
+        <div class="ready-card">
+
+            <div class="ready-title">
+                ✓ Policy Ready
+            </div>
+
+            <div class="ready-text">
+                Your document has been indexed.
+                Ask a question below to retrieve
+                relevant HR policy information.
+            </div>
+
         </div>
         """,
         unsafe_allow_html=True,
@@ -817,14 +1038,14 @@ for message in st.session_state.messages:
 if st.session_state.index is None:
 
     st.info(
-        "👈 Upload an HR policy PDF "
-        "from the sidebar to begin."
+        "📤 Upload an HR policy PDF from the "
+        "sidebar to start asking questions."
     )
 
 else:
 
     question = st.chat_input(
-        "Ask a question about the HR policy..."
+        "Ask something about the HR policy..."
     )
 
     if question:
@@ -844,12 +1065,10 @@ else:
 
             try:
 
-                embedding_model = (
-                    load_embedding_model()
-                )
+                model = load_embedding_model()
 
                 with st.spinner(
-                    "🔎 Searching the policy..."
+                    "🔎 Searching policy..."
                 ):
 
                     retrieved_chunks = (
@@ -857,7 +1076,7 @@ else:
                             question,
                             st.session_state.index,
                             st.session_state.chunks,
-                            embedding_model,
+                            model,
                             top_k=4,
                         )
                     )
@@ -871,18 +1090,44 @@ else:
                         retrieved_chunks
                     )
 
-                # Answer heading
+                # -----------------------------------------
+                # ANSWER
+                # -----------------------------------------
+
                 st.markdown(
-                    "### 🤖 Answer"
+                    """
+                    <div class="answer-card">
+
+                        <div class="answer-header">
+                            🤖 AI Answer
+                        </div>
+
+                        <div class="answer-text">
+                    """,
+                    unsafe_allow_html=True,
                 )
 
-                # Normal Streamlit markdown.
-                # No custom HTML wrapper.
                 st.markdown(answer)
 
-                # Sources
                 st.markdown(
-                    "### 📚 Sources"
+                    """
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+                # -----------------------------------------
+                # SOURCES
+                # -----------------------------------------
+
+                st.markdown(
+                    """
+                    <div class="sources-title">
+                        📚 Retrieved Sources
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
                 )
 
                 seen_pages = set()
@@ -896,20 +1141,22 @@ else:
 
                     seen_pages.add(page)
 
-                    preview = source["text"][:300]
-
                     preview = html.escape(
-                        preview
+                        source["text"][:350]
                     )
 
                     st.markdown(
                         f"""
                         <div class="source-card">
-                            <b>📄 Page {page}</b>
-                            <br><br>
-                            <span>
+
+                            <div class="source-page">
+                                📄 Policy Page {page}
+                            </div>
+
+                            <div class="source-text">
                                 {preview}...
-                            </span>
+                            </div>
+
                         </div>
                         """,
                         unsafe_allow_html=True,
