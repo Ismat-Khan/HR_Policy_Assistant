@@ -1,16 +1,18 @@
+import io
 import os
 import html
 
 import faiss
-import fitz
+import fitz  # PyMuPDF
+import numpy as np
 import streamlit as st
 from sentence_transformers import SentenceTransformer
 from groq import Groq
 
 
-# =========================================================
+# ---------------------------------------------------------
 # PAGE CONFIG
-# =========================================================
+# ---------------------------------------------------------
 
 st.set_page_config(
     page_title="HR Policy Assistant",
@@ -20,173 +22,115 @@ st.set_page_config(
 )
 
 
-# =========================================================
-# UI STYLING
-# =========================================================
-# IMPORTANT:
-# This UI does NOT use custom HTML div/span elements.
-# Only CSS is used here.
+# ---------------------------------------------------------
+# CUSTOM CSS
+# ---------------------------------------------------------
 
 st.markdown(
     """
     <style>
+        .stApp {
+            background: #f7f9fc;
+        }
 
-    /* ================================
-       MAIN APP
-       ================================ */
+        .main-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: #172033;
+            margin-bottom: 5px;
+        }
 
-    .stApp {
-        background-color: #f5f7fb;
-    }
+        .subtitle {
+            color: #667085;
+            font-size: 17px;
+            margin-bottom: 25px;
+        }
 
-    .main .block-container {
-        max-width: 1250px;
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-    }
+        .info-card {
+            background: white;
+            padding: 22px;
+            border-radius: 16px;
+            border: 1px solid #e4e7ec;
+            margin-bottom: 20px;
+        }
 
-    /* ================================
-       TEXT
-       ================================ */
+        .status-card {
+            background: #eef7ff;
+            border-left: 5px solid #2563eb;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
 
-    h1, h2, h3, h4, h5, h6 {
-        color: #172033 !important;
-    }
+        .source-card {
+            background: #ffffff;
+            border: 1px solid #e4e7ec;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+        }
 
-    p {
-        color: #344054;
-    }
+        .metric-card {
+            background: white;
+            border: 1px solid #e4e7ec;
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+        }
 
-    /* ================================
-       SIDEBAR
-       ================================ */
+        .metric-number {
+            font-size: 28px;
+            font-weight: 800;
+            color: #2563eb;
+        }
 
-    section[data-testid="stSidebar"] {
-        background-color: #ffffff !important;
-        border-right: 1px solid #e4e7ec;
-    }
+        .metric-label {
+            color: #667085;
+            font-size: 14px;
+        }
 
-    section[data-testid="stSidebar"] p {
-        color: #344054 !important;
-    }
+        div[data-testid="stFileUploader"] {
+            background: white;
+            border-radius: 14px;
+            padding: 10px;
+        }
 
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3 {
-        color: #172033 !important;
-    }
-
-    /* ================================
-       FILE UPLOADER
-       ================================ */
-
-    [data-testid="stFileUploader"] {
-        background-color: #f8faff !important;
-        border: 2px dashed #b9c8e5 !important;
-        border-radius: 14px !important;
-        padding: 10px !important;
-    }
-
-    [data-testid="stFileUploader"] section {
-        background-color: transparent !important;
-    }
-
-    [data-testid="stFileUploader"] button {
-        background-color: #315fd3 !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 8px !important;
-    }
-
-    /* ================================
-       CHAT INPUT
-       ================================ */
-
-    [data-testid="stChatInput"] {
-        background-color: #ffffff !important;
-        border: 1px solid #d0d5dd !important;
-        border-radius: 16px !important;
-        box-shadow: 0 5px 20px rgba(16, 24, 40, 0.08) !important;
-    }
-
-    [data-testid="stChatInput"] textarea {
-        background-color: #ffffff !important;
-        color: #172033 !important;
-    }
-
-    [data-testid="stChatInput"] textarea::placeholder {
-        color: #98a2b3 !important;
-    }
-
-    [data-testid="stChatInput"] button {
-        background-color: #315fd3 !important;
-        color: white !important;
-        border-radius: 10px !important;
-    }
-
-    /* ================================
-       CHAT MESSAGES
-       ================================ */
-
-    [data-testid="stChatMessage"] {
-        border-radius: 14px !important;
-        border: 1px solid #e4e7ec !important;
-    }
-
-    /* ================================
-       BUTTONS
-       ================================ */
-
-    .stButton > button {
-        border-radius: 10px !important;
-        border: 1px solid #cfd8ea !important;
-        background-color: #eef3ff !important;
-        color: #2856c5 !important;
-        font-weight: 600 !important;
-    }
-
-    .stButton > button:hover {
-        background-color: #e0e9ff !important;
-        border-color: #9fb5e5 !important;
-    }
-
-    /* ================================
-       METRICS
-       ================================ */
-
-    [data-testid="stMetric"] {
-        background-color: #ffffff;
-        border: 1px solid #e4e7ec;
-        border-radius: 16px;
-        padding: 18px;
-        box-shadow: 0 4px 15px rgba(16, 24, 40, 0.04);
-    }
-
-    [data-testid="stMetricLabel"] {
-        color: #667085 !important;
-    }
-
-    [data-testid="stMetricValue"] {
-        color: #315fd3 !important;
-    }
-
-    /* ================================
-       ALERTS
-       ================================ */
-
-    [data-testid="stAlert"] {
-        border-radius: 12px !important;
-    }
-
+        .answer-box {
+            background: white;
+            border: 1px solid #e4e7ec;
+            border-radius: 16px;
+            padding: 22px;
+            margin-top: 15px;
+        }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
 
-# =========================================================
+# ---------------------------------------------------------
+# TITLE
+# ---------------------------------------------------------
+
+st.markdown(
+    '<div class="main-title">📋 HR Policy Assistant</div>',
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    """
+    <div class="subtitle">
+        Upload an HR policy PDF and ask questions using
+        Retrieval-Augmented Generation (RAG).
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# ---------------------------------------------------------
 # SESSION STATE
-# =========================================================
+# ---------------------------------------------------------
 
 if "chunks" not in st.session_state:
     st.session_state.chunks = []
@@ -201,67 +145,49 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 
-# =========================================================
-# EMBEDDING MODEL
-# =========================================================
+# ---------------------------------------------------------
+# LOAD EMBEDDING MODEL
+# ---------------------------------------------------------
 
 @st.cache_resource
 def load_embedding_model():
-    return SentenceTransformer(
-        "all-MiniLM-L6-v2"
-    )
+    return SentenceTransformer("all-MiniLM-L6-v2")
 
 
-# =========================================================
-# GROQ CLIENT
-# =========================================================
+# ---------------------------------------------------------
+# GET GROQ CLIENT
+# ---------------------------------------------------------
 
 def get_groq_client():
-
     api_key = None
 
     try:
-        api_key = st.secrets.get(
-            "GROQ_API_KEY"
-        )
+        api_key = st.secrets.get("GROQ_API_KEY")
     except Exception:
         pass
 
     if not api_key:
-        api_key = os.getenv(
-            "GROQ_API_KEY"
-        )
+        api_key = os.getenv("GROQ_API_KEY")
 
     if not api_key:
         return None
 
-    return Groq(
-        api_key=api_key
-    )
+    return Groq(api_key=api_key)
 
 
-# =========================================================
-# PDF TEXT EXTRACTION
-# =========================================================
+# ---------------------------------------------------------
+# EXTRACT TEXT FROM PDF
+# ---------------------------------------------------------
 
 def extract_pdf_text(pdf_bytes):
-
-    document = fitz.open(
-        stream=pdf_bytes,
-        filetype="pdf"
-    )
+    document = fitz.open(stream=pdf_bytes, filetype="pdf")
 
     pages = []
 
-    for page_number, page in enumerate(
-        document,
-        start=1
-    ):
-
+    for page_number, page in enumerate(document, start=1):
         text = page.get_text("text")
 
         if text.strip():
-
             pages.append(
                 {
                     "page": page_number,
@@ -274,20 +200,14 @@ def extract_pdf_text(pdf_bytes):
     return pages
 
 
-# =========================================================
-# CREATE CHUNKS
-# =========================================================
+# ---------------------------------------------------------
+# SPLIT TEXT INTO CHUNKS
+# ---------------------------------------------------------
 
-def create_chunks(
-    pages,
-    chunk_size=900,
-    overlap=150
-):
-
+def create_chunks(pages, chunk_size=900, overlap=150):
     chunks = []
 
     for page_data in pages:
-
         page_number = page_data["page"]
         text = page_data["text"]
 
@@ -296,20 +216,16 @@ def create_chunks(
         start = 0
 
         while start < len(words):
-
             end = start + chunk_size
 
-            chunk_words = words[
-                start:end
-            ]
+            chunk_words = words[start:end]
 
             if chunk_words:
+                chunk_text = " ".join(chunk_words)
 
                 chunks.append(
                     {
-                        "text": " ".join(
-                            chunk_words
-                        ),
+                        "text": chunk_text,
                         "page": page_number,
                     }
                 )
@@ -322,19 +238,12 @@ def create_chunks(
     return chunks
 
 
-# =========================================================
+# ---------------------------------------------------------
 # CREATE FAISS INDEX
-# =========================================================
+# ---------------------------------------------------------
 
-def create_faiss_index(
-    chunks,
-    model
-):
-
-    texts = [
-        chunk["text"]
-        for chunk in chunks
-    ]
+def create_faiss_index(chunks, model):
+    texts = [chunk["text"] for chunk in chunks]
 
     embeddings = model.encode(
         texts,
@@ -343,71 +252,45 @@ def create_faiss_index(
         show_progress_bar=False,
     )
 
-    embeddings = embeddings.astype(
-        "float32"
-    )
+    embeddings = embeddings.astype("float32")
 
-    index = faiss.IndexFlatIP(
-        embeddings.shape[1]
-    )
+    dimension = embeddings.shape[1]
 
-    index.add(
-        embeddings
-    )
+    index = faiss.IndexFlatIP(dimension)
+
+    index.add(embeddings)
 
     return index
 
 
-# =========================================================
+# ---------------------------------------------------------
 # RETRIEVE RELEVANT CHUNKS
-# =========================================================
+# ---------------------------------------------------------
 
-def retrieve_chunks(
-    question,
-    index,
-    chunks,
-    model,
-    top_k=4
-):
-
+def retrieve_chunks(question, index, chunks, model, top_k=4):
     question_embedding = model.encode(
         [question],
         convert_to_numpy=True,
         normalize_embeddings=True,
     )
 
-    question_embedding = (
-        question_embedding.astype(
-            "float32"
-        )
-    )
+    question_embedding = question_embedding.astype("float32")
 
     scores, indices = index.search(
         question_embedding,
-        min(
-            top_k,
-            len(chunks)
-        )
+        min(top_k, len(chunks)),
     )
 
     results = []
 
-    for score, position in zip(
-        scores[0],
-        indices[0]
-    ):
-
-        if position == -1:
+    for score, index_position in zip(scores[0], indices[0]):
+        if index_position == -1:
             continue
 
         results.append(
             {
-                "text": chunks[position][
-                    "text"
-                ],
-                "page": chunks[position][
-                    "page"
-                ],
+                "text": chunks[index_position]["text"],
+                "page": chunks[index_position]["page"],
                 "score": float(score),
             }
         )
@@ -415,56 +298,44 @@ def retrieve_chunks(
     return results
 
 
-# =========================================================
+# ---------------------------------------------------------
 # ASK GROQ
-# =========================================================
+# ---------------------------------------------------------
 
-def ask_groq(
-    question,
-    retrieved_chunks
-):
-
+def ask_groq(question, retrieved_chunks):
     client = get_groq_client()
 
     if client is None:
-
         raise ValueError(
             "GROQ_API_KEY is not configured. "
-            "Please add it to Streamlit Secrets."
+            "Add it to Streamlit Secrets."
         )
 
     context_parts = []
 
     for item in retrieved_chunks:
-
         context_parts.append(
-            f"[Page {item['page']}]\n"
-            f"{item['text']}"
+            f"[Page {item['page']}]\n{item['text']}"
         )
 
-    context = "\n\n".join(
-        context_parts
-    )
+    context = "\n\n".join(context_parts)
 
     system_prompt = """
 You are an HR Policy Assistant.
 
-Answer the user's question using ONLY
-the HR policy context provided.
+Answer the user's question using ONLY the HR policy context
+provided below.
 
 Rules:
-
-1. Do not invent HR policies.
-2. Do not use outside information.
-3. If the answer is not found in the
-   provided context, clearly say that the
-   uploaded policy does not contain enough
-   information to answer the question.
-4. Keep the answer clear and professional.
-5. Mention the relevant policy page when
-   possible.
-6. Do not make assumptions.
-7. Do not provide legal advice.
+1. Do not invent policies.
+2. If the answer is not present in the provided context,
+   clearly say that the uploaded policy does not contain
+   enough information to answer the question.
+3. Keep the answer clear and professional.
+4. Mention the relevant policy page when possible.
+5. Do not treat your answer as legal advice.
+6. Do not make assumptions about information that is not
+   present in the document.
 """
 
     user_prompt = f"""
@@ -476,7 +347,7 @@ USER QUESTION:
 
 {question}
 
-Answer using only the provided HR policy context.
+Answer based only on the policy context.
 """
 
     response = client.chat.completions.create(
@@ -494,78 +365,62 @@ Answer using only the provided HR policy context.
         temperature=0.1,
     )
 
-    return (
-        response.choices[0]
-        .message.content
-    )
+    return response.choices[0].message.content
 
 
-# =========================================================
+# ---------------------------------------------------------
 # SIDEBAR
-# =========================================================
+# ---------------------------------------------------------
 
 with st.sidebar:
 
-    st.title("📄 HR Document")
-
-    st.caption(
-        "Upload your organization's HR policy "
-        "to begin."
-    )
-
-    st.subheader("📤 Upload Policy")
+    st.markdown("## 📄 Document")
 
     uploaded_file = st.file_uploader(
-        "Choose an HR policy PDF",
+        "Upload HR Policy PDF",
         type=["pdf"],
         help="Upload a text-based HR policy PDF.",
     )
 
-    st.divider()
+    st.markdown("---")
 
-    st.subheader("🔎 RAG Pipeline")
-
-    st.markdown(
-        "🟦 **01 — PDF Upload**"
-    )
+    st.markdown("### 🔎 RAG Pipeline")
 
     st.markdown(
-        "🟦 **02 — PyMuPDF Extraction**"
+        """
+        **1. Upload**  
+        HR policy PDF
+
+        **2. Extract**  
+        PyMuPDF
+
+        **3. Chunk**  
+        Split policy text
+
+        **4. Embed**  
+        Sentence Transformers
+
+        **5. Search**  
+        FAISS similarity search
+
+        **6. Generate**  
+        Groq LLM
+        """
     )
 
-    st.markdown(
-        "🟦 **03 — Text Chunking**"
-    )
-
-    st.markdown(
-        "🟦 **04 — Sentence Transformers**"
-    )
-
-    st.markdown(
-        "🟦 **05 — FAISS Retrieval**"
-    )
-
-    st.markdown(
-        "🟦 **06 — Groq Generation**"
-    )
+    st.markdown("---")
 
     if st.session_state.document_name:
 
-        st.divider()
-
         st.success(
-            f"📄 {st.session_state.document_name}"
+            f"Loaded:\n\n{st.session_state.document_name}"
         )
 
         st.caption(
-            f"{len(st.session_state.chunks)} "
-            "policy chunks indexed"
+            f"Chunks: {len(st.session_state.chunks)}"
         )
 
-        if st.button(
-            "🗑️ Clear Document",
-            use_container_width=True
-        ):
+        if st.button("🗑️ Clear Document", use_container_width=True):
 
             st.session_state.chunks = []
             st.session_state.index = None
@@ -575,30 +430,9 @@ with st.sidebar:
             st.rerun()
 
 
-# =========================================================
-# MAIN HEADER
-# =========================================================
-
-st.title(
-    "📋 HR Policy Assistant"
-)
-
-st.caption(
-    "AI-powered document question answering "
-    "using Retrieval-Augmented Generation (RAG)."
-)
-
-st.markdown(
-    "Upload an HR policy PDF and ask questions "
-    "about its contents in natural language."
-)
-
-st.divider()
-
-
-# =========================================================
+# ---------------------------------------------------------
 # PROCESS PDF
-# =========================================================
+# ---------------------------------------------------------
 
 if uploaded_file is not None:
 
@@ -607,154 +441,137 @@ if uploaded_file is not None:
         != uploaded_file.name
     ):
 
-        with st.status(
-            "Processing HR policy...",
-            expanded=True
+        with st.spinner("📖 Reading HR policy PDF..."):
+
+            pdf_bytes = uploaded_file.getvalue()
+
+            pages = extract_pdf_text(pdf_bytes)
+
+        if not pages:
+            st.error(
+                "No readable text was found in this PDF. "
+                "Please upload a text-based PDF."
+            )
+            st.stop()
+
+        with st.spinner("✂️ Creating policy chunks..."):
+
+            chunks = create_chunks(pages)
+
+        with st.spinner(
+            "🧠 Creating embeddings and FAISS index..."
         ):
 
-            st.write(
-                "📖 Extracting text with PyMuPDF..."
-            )
-
-            pdf_bytes = (
-                uploaded_file.getvalue()
-            )
-
-            pages = extract_pdf_text(
-                pdf_bytes
-            )
-
-            if not pages:
-
-                st.error(
-                    "No readable text was found "
-                    "in this PDF. Please upload a "
-                    "text-based PDF."
-                )
-
-                st.stop()
-
-            st.write(
-                f"✓ Extracted {len(pages)} pages"
-            )
-
-            st.write(
-                "✂️ Creating text chunks..."
-            )
-
-            chunks = create_chunks(
-                pages
-            )
-
-            st.write(
-                f"✓ Created {len(chunks)} chunks"
-            )
-
-            st.write(
-                "🧠 Creating Sentence Transformer embeddings..."
-            )
-
-            model = load_embedding_model()
-
-            st.write(
-                "🔎 Building FAISS vector index..."
-            )
+            embedding_model = load_embedding_model()
 
             index = create_faiss_index(
                 chunks,
-                model
-            )
-
-            st.write(
-                "✓ FAISS index ready"
+                embedding_model,
             )
 
         st.session_state.chunks = chunks
-
         st.session_state.index = index
-
-        st.session_state.document_name = (
-            uploaded_file.name
-        )
-
+        st.session_state.document_name = uploaded_file.name
         st.session_state.messages = []
 
         st.success(
-            "✅ HR policy uploaded and indexed successfully!"
+            f"✅ {uploaded_file.name} is ready for questions!"
         )
 
 
-# =========================================================
-# DOCUMENT STATISTICS
-# =========================================================
+# ---------------------------------------------------------
+# DOCUMENT STATUS
+# ---------------------------------------------------------
 
 if st.session_state.index is not None:
 
-    st.subheader(
-        "📊 Document Overview"
-    )
+    chunks_count = len(st.session_state.chunks)
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
-
-        st.metric(
-            label="📄 Policy Chunks",
-            value=len(
-                st.session_state.chunks
-            ),
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-number">
+                    {chunks_count}
+                </div>
+                <div class="metric-label">
+                    Policy Chunks
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     with col2:
-
-        st.metric(
-            label="🔎 Vector Search",
-            value="FAISS",
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-number">
+                    FAISS
+                </div>
+                <div class="metric-label">
+                    Vector Search
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     with col3:
-
-        st.metric(
-            label="🤖 Answer Generation",
-            value="RAG",
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-number">
+                    RAG
+                </div>
+                <div class="metric-label">
+                    Answer Generation
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-    st.success(
-        "✓ Policy Ready — "
-        "Ask a question about the uploaded HR policy below."
+    st.markdown("")
+
+    st.markdown(
+        """
+        <div class="status-card">
+            <b>✅ Policy Ready</b><br>
+            Ask questions about the uploaded HR policy below.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ---------------------------------------------------------
+# CHAT HISTORY
+# ---------------------------------------------------------
+
+for message in st.session_state.messages:
+
+    with st.chat_message(message["role"]):
+
+        st.markdown(message["content"])
+
+
+# ---------------------------------------------------------
+# QUESTION INPUT
+# ---------------------------------------------------------
+
+if st.session_state.index is None:
+
+    st.info(
+        "👈 Upload an HR policy PDF from the sidebar to begin."
     )
 
 else:
 
-    st.info(
-        "📤 Upload an HR policy PDF from the sidebar "
-        "to start asking questions."
-    )
-
-
-# =========================================================
-# CHAT HISTORY
-# =========================================================
-
-for message in st.session_state.messages:
-
-    with st.chat_message(
-        message["role"]
-    ):
-
-        st.markdown(
-            message["content"]
-        )
-
-
-# =========================================================
-# QUESTION INPUT
-# =========================================================
-
-if st.session_state.index is not None:
-
     question = st.chat_input(
-        "Ask something about the HR policy..."
+        "Ask a question about the HR policy..."
     )
 
     if question:
@@ -767,29 +584,24 @@ if st.session_state.index is not None:
         )
 
         with st.chat_message("user"):
-
             st.markdown(question)
 
         with st.chat_message("assistant"):
 
             try:
 
-                model = (
-                    load_embedding_model()
-                )
+                embedding_model = load_embedding_model()
 
                 with st.spinner(
-                    "🔎 Searching the HR policy..."
+                    "🔎 Searching the policy..."
                 ):
 
-                    retrieved_chunks = (
-                        retrieve_chunks(
-                            question,
-                            st.session_state.index,
-                            st.session_state.chunks,
-                            model,
-                            top_k=4,
-                        )
+                    retrieved_chunks = retrieve_chunks(
+                        question,
+                        st.session_state.index,
+                        st.session_state.chunks,
+                        embedding_model,
+                        top_k=4,
                     )
 
                 with st.spinner(
@@ -798,30 +610,23 @@ if st.session_state.index is not None:
 
                     answer = ask_groq(
                         question,
-                        retrieved_chunks
+                        retrieved_chunks,
                     )
 
-                # =========================================
-                # ANSWER
-                # =========================================
-
-                st.subheader(
-                    "🤖 AI Answer"
+                st.markdown(
+                    '<div class="answer-box">',
+                    unsafe_allow_html=True,
                 )
+
+                st.markdown(answer)
 
                 st.markdown(
-                    answer
+                    "</div>",
+                    unsafe_allow_html=True,
                 )
 
-                # =========================================
-                # SOURCES
-                # =========================================
-
-                st.divider()
-
-                st.subheader(
-                    "📚 Retrieved Sources"
-                )
+                # Sources
+                st.markdown("### 📚 Sources")
 
                 seen_pages = set()
 
@@ -834,22 +639,21 @@ if st.session_state.index is not None:
 
                     seen_pages.add(page)
 
-                    preview = (
-                        source["text"][:350]
-                        .replace("\n", " ")
+                    preview = source["text"][:300]
+
+                    preview = html.escape(preview)
+
+                    st.markdown(
+                        f"""
+                        <div class="source-card">
+                            <b>📄 Page {page}</b><br>
+                            <span style="color:#667085;">
+                                {preview}...
+                            </span>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
                     )
-
-                    with st.container(
-                        border=True
-                    ):
-
-                        st.markdown(
-                            f"**📄 Policy Page {page}**"
-                        )
-
-                        st.caption(
-                            preview + "..."
-                        )
 
                 st.session_state.messages.append(
                     {
@@ -861,9 +665,5 @@ if st.session_state.index is not None:
             except Exception as error:
 
                 st.error(
-                    "Something went wrong:"
-                )
-
-                st.code(
-                    str(error)
+                    f"Something went wrong:\n\n{error}"
                 )
