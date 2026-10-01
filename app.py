@@ -29,11 +29,11 @@ st.markdown(
     <style>
 
     /* =====================================================
-       GLOBAL
+       GLOBAL APP
     ===================================================== */
 
     .stApp {
-        background: #f4f7fc;
+        background-color: #f4f7fc;
     }
 
     .main .block-container {
@@ -42,17 +42,26 @@ st.markdown(
         padding-bottom: 3rem;
     }
 
-    /* Remove excessive Streamlit spacing */
-    [data-testid="stVerticalBlock"] {
-        gap: 0.6rem;
+    /* =====================================================
+       HEADINGS
+    ===================================================== */
+
+    h1, h2, h3, h4, h5, h6 {
+        color: #172033 !important;
     }
+
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li {
+        color: #172033 !important;
+    }
+
 
     /* =====================================================
        SIDEBAR
     ===================================================== */
 
     section[data-testid="stSidebar"] {
-        background: #ffffff !important;
+        background-color: #ffffff !important;
         border-right: 1px solid #e3e8f2;
     }
 
@@ -60,11 +69,6 @@ st.markdown(
         color: #172033 !important;
     }
 
-    section[data-testid="stSidebar"] .stMarkdown {
-        color: #172033 !important;
-    }
-
-    /* Sidebar title */
     .sidebar-title {
         font-size: 24px;
         font-weight: 800;
@@ -75,11 +79,13 @@ st.markdown(
     .sidebar-subtitle {
         color: #667085 !important;
         font-size: 14px;
-        margin-bottom: 20px;
+        line-height: 1.5;
+        margin-bottom: 18px;
     }
 
+
     /* =====================================================
-       HEADER
+       HERO
     ===================================================== */
 
     .hero {
@@ -99,6 +105,17 @@ st.markdown(
         box-shadow: 0 8px 30px rgba(35, 75, 140, 0.06);
     }
 
+    .hero-badge {
+        display: inline-block;
+        background-color: #e0eaff;
+        color: #2856c5 !important;
+        border-radius: 50px;
+        padding: 6px 13px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
     .hero-title {
         font-size: 38px;
         font-weight: 800;
@@ -109,27 +126,105 @@ st.markdown(
     .hero-subtitle {
         color: #667085 !important;
         font-size: 16px;
-        margin-top: 8px;
         line-height: 1.6;
+        margin-top: 8px;
     }
 
-    .hero-badge {
-        display: inline-block;
-        background: #e0eaff;
-        color: #2856c5 !important;
-        border-radius: 50px;
-        padding: 6px 13px;
-        font-size: 12px;
-        font-weight: 700;
+
+    /* =====================================================
+       UPLOAD CARD
+    ===================================================== */
+
+    .upload-card {
+        background-color: #ffffff;
+        border: 1px solid #dfe6f2;
+        border-radius: 18px;
+        padding: 18px;
+        margin-bottom: 10px;
+        box-shadow: 0 5px 20px rgba(30, 60, 100, 0.04);
+    }
+
+    .upload-title {
+        color: #172033 !important;
+        font-size: 18px;
+        font-weight: 750;
+        margin-bottom: 5px;
+    }
+
+    .upload-description {
+        color: #667085 !important;
+        font-size: 13px;
+    }
+
+
+    /* =====================================================
+       FILE UPLOADER
+    ===================================================== */
+
+    [data-testid="stFileUploader"] {
+        background-color: #f7f9fd !important;
+        border: 2px dashed #c9d6ed !important;
+        border-radius: 14px !important;
+        padding: 8px !important;
+    }
+
+    [data-testid="stFileUploader"] section {
+        background-color: transparent !important;
+    }
+
+    [data-testid="stFileUploader"] * {
+        color: #344054 !important;
+    }
+
+    [data-testid="stFileUploaderDropzone"] {
+        background-color: #f7f9fd !important;
+    }
+
+
+    /* =====================================================
+       RAG PIPELINE
+    ===================================================== */
+
+    .pipeline-card {
+        background-color: #f8faff;
+        border: 1px solid #e1e7f2;
+        border-radius: 16px;
+        padding: 18px;
+    }
+
+    .pipeline-heading {
+        font-size: 17px;
+        font-weight: 800;
+        color: #172033 !important;
         margin-bottom: 12px;
     }
+
+    .pipeline-step {
+        background-color: #ffffff;
+        border: 1px solid #e1e7f2;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+    }
+
+    .pipeline-number {
+        color: #315fd3 !important;
+        font-weight: 800;
+        margin-right: 8px;
+    }
+
+    .pipeline-text {
+        color: #344054 !important;
+        font-size: 13px;
+    }
+
 
     /* =====================================================
        STAT CARDS
     ===================================================== */
 
     .stat-card {
-        background: #ffffff;
+        background-color: #ffffff;
         border: 1px solid #e3e8f2;
         border-radius: 18px;
         padding: 20px;
@@ -154,51 +249,6 @@ st.markdown(
         margin-top: 3px;
     }
 
-    /* =====================================================
-       UPLOAD AREA
-    ===================================================== */
-
-    .upload-card {
-        background: #ffffff;
-        border: 1px solid #dfe6f2;
-        border-radius: 18px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 5px 20px rgba(30, 60, 100, 0.04);
-    }
-
-    .upload-title {
-        color: #172033 !important;
-        font-size: 18px;
-        font-weight: 750;
-        margin-bottom: 5px;
-    }
-
-    .upload-description {
-        color: #667085 !important;
-        font-size: 13px;
-        margin-bottom: 15px;
-    }
-
-    /* Streamlit uploader */
-    [data-testid="stFileUploader"] {
-        background: #f7f9fd !important;
-        border: 2px dashed #c9d6ed !important;
-        border-radius: 14px !important;
-        padding: 8px !important;
-    }
-
-    [data-testid="stFileUploader"] section {
-        background: transparent !important;
-    }
-
-    [data-testid="stFileUploader"] * {
-        color: #344054 !important;
-    }
-
-    [data-testid="stFileUploaderDropzone"] {
-        background: #f7f9fd !important;
-    }
 
     /* =====================================================
        POLICY READY
@@ -232,13 +282,13 @@ st.markdown(
         margin-top: 3px;
     }
 
+
     /* =====================================================
-       CHAT AREA
+       CHAT INPUT
     ===================================================== */
 
-    /* Chat input container */
     [data-testid="stChatInput"] {
-        background: #ffffff !important;
+        background-color: #ffffff !important;
         border: 1px solid #d7e0ef !important;
         border-radius: 18px !important;
         padding: 5px !important;
@@ -246,7 +296,7 @@ st.markdown(
     }
 
     [data-testid="stChatInput"] textarea {
-        background: #ffffff !important;
+        background-color: #ffffff !important;
         color: #172033 !important;
         border: none !important;
         font-size: 15px !important;
@@ -257,7 +307,7 @@ st.markdown(
     }
 
     [data-testid="stChatInput"] button {
-        background: #315fd3 !important;
+        background-color: #315fd3 !important;
         color: #ffffff !important;
         border-radius: 12px !important;
     }
@@ -266,12 +316,13 @@ st.markdown(
         color: #ffffff !important;
     }
 
+
     /* =====================================================
        CHAT MESSAGES
     ===================================================== */
 
     [data-testid="stChatMessage"] {
-        background: #ffffff !important;
+        background-color: #ffffff !important;
         border: 1px solid #e3e8f2 !important;
         border-radius: 16px !important;
         margin-bottom: 12px !important;
@@ -285,12 +336,13 @@ st.markdown(
         color: #172033 !important;
     }
 
+
     /* =====================================================
        ANSWER CARD
     ===================================================== */
 
     .answer-card {
-        background: #ffffff;
+        background-color: #ffffff;
         border: 1px solid #dfe6f2;
         border-radius: 20px;
         padding: 24px;
@@ -317,8 +369,9 @@ st.markdown(
         color: #172033 !important;
     }
 
+
     /* =====================================================
-       SOURCES
+       SOURCE CARDS
     ===================================================== */
 
     .sources-title {
@@ -330,7 +383,7 @@ st.markdown(
     }
 
     .source-card {
-        background: #ffffff;
+        background-color: #ffffff;
         border: 1px solid #e1e7f0;
         border-radius: 14px;
         padding: 15px 18px;
@@ -350,41 +403,13 @@ st.markdown(
         margin-top: 5px;
     }
 
-    /* =====================================================
-       PIPELINE
-    ===================================================== */
-
-    .pipeline-card {
-        background: #f8faff;
-        border: 1px solid #e1e7f2;
-        border-radius: 16px;
-        padding: 18px;
-    }
-
-    .pipeline-step {
-        background: #ffffff;
-        border: 1px solid #e4e9f2;
-        border-radius: 10px;
-        padding: 9px 11px;
-        margin-bottom: 8px;
-    }
-
-    .pipeline-number {
-        color: #315fd3 !important;
-        font-weight: 800;
-    }
-
-    .pipeline-text {
-        color: #344054 !important;
-        font-size: 13px;
-    }
 
     /* =====================================================
        BUTTONS
     ===================================================== */
 
     .stButton > button {
-        background: #eef3ff !important;
+        background-color: #eef3ff !important;
         color: #2856c5 !important;
         border: 1px solid #ccd9f3 !important;
         border-radius: 10px !important;
@@ -392,12 +417,13 @@ st.markdown(
     }
 
     .stButton > button:hover {
-        background: #e1eaff !important;
+        background-color: #e1eaff !important;
         border-color: #b7c9eb !important;
     }
 
+
     /* =====================================================
-       INFO / SUCCESS / ERROR
+       ALERTS
     ===================================================== */
 
     [data-testid="stAlert"] {
@@ -405,19 +431,6 @@ st.markdown(
     }
 
     [data-testid="stAlert"] p {
-        color: #172033 !important;
-    }
-
-    /* =====================================================
-       GENERAL TEXT
-    ===================================================== */
-
-    h1, h2, h3, h4, h5, h6 {
-        color: #172033 !important;
-    }
-
-    [data-testid="stMarkdownContainer"] p,
-    [data-testid="stMarkdownContainer"] li {
         color: #172033 !important;
     }
 
@@ -445,12 +458,14 @@ if "messages" not in st.session_state:
 
 
 # =========================================================
-# EMBEDDING MODEL
+# LOAD SENTENCE TRANSFORMER
 # =========================================================
 
 @st.cache_resource
 def load_embedding_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
+    return SentenceTransformer(
+        "all-MiniLM-L6-v2"
+    )
 
 
 # =========================================================
@@ -462,21 +477,27 @@ def get_groq_client():
     api_key = None
 
     try:
-        api_key = st.secrets.get("GROQ_API_KEY")
+        api_key = st.secrets.get(
+            "GROQ_API_KEY"
+        )
     except Exception:
         pass
 
     if not api_key:
-        api_key = os.getenv("GROQ_API_KEY")
+        api_key = os.getenv(
+            "GROQ_API_KEY"
+        )
 
     if not api_key:
         return None
 
-    return Groq(api_key=api_key)
+    return Groq(
+        api_key=api_key
+    )
 
 
 # =========================================================
-# PDF TEXT EXTRACTION
+# EXTRACT TEXT FROM PDF
 # =========================================================
 
 def extract_pdf_text(pdf_bytes):
@@ -510,7 +531,7 @@ def extract_pdf_text(pdf_bytes):
 
 
 # =========================================================
-# CHUNKING
+# CREATE TEXT CHUNKS
 # =========================================================
 
 def create_chunks(
@@ -534,13 +555,17 @@ def create_chunks(
 
             end = start + chunk_size
 
-            chunk_words = words[start:end]
+            chunk_words = words[
+                start:end
+            ]
 
             if chunk_words:
 
                 chunks.append(
                     {
-                        "text": " ".join(chunk_words),
+                        "text": " ".join(
+                            chunk_words
+                        ),
                         "page": page_number,
                     }
                 )
@@ -554,10 +579,13 @@ def create_chunks(
 
 
 # =========================================================
-# FAISS INDEX
+# CREATE FAISS INDEX
 # =========================================================
 
-def create_faiss_index(chunks, model):
+def create_faiss_index(
+    chunks,
+    model
+):
 
     texts = [
         chunk["text"]
@@ -571,19 +599,23 @@ def create_faiss_index(chunks, model):
         show_progress_bar=False,
     )
 
-    embeddings = embeddings.astype("float32")
+    embeddings = embeddings.astype(
+        "float32"
+    )
 
     index = faiss.IndexFlatIP(
         embeddings.shape[1]
     )
 
-    index.add(embeddings)
+    index.add(
+        embeddings
+    )
 
     return index
 
 
 # =========================================================
-# RETRIEVAL
+# RETRIEVE RELEVANT CHUNKS
 # =========================================================
 
 def retrieve_chunks(
@@ -601,12 +633,17 @@ def retrieve_chunks(
     )
 
     question_embedding = (
-        question_embedding.astype("float32")
+        question_embedding.astype(
+            "float32"
+        )
     )
 
     scores, indices = index.search(
         question_embedding,
-        min(top_k, len(chunks))
+        min(
+            top_k,
+            len(chunks)
+        )
     )
 
     results = []
@@ -621,8 +658,12 @@ def retrieve_chunks(
 
         results.append(
             {
-                "text": chunks[position]["text"],
-                "page": chunks[position]["page"],
+                "text": chunks[position][
+                    "text"
+                ],
+                "page": chunks[position][
+                    "page"
+                ],
                 "score": float(score),
             }
         )
@@ -631,7 +672,7 @@ def retrieve_chunks(
 
 
 # =========================================================
-# GROQ ANSWER
+# ASK GROQ
 # =========================================================
 
 def ask_groq(
@@ -648,11 +689,17 @@ def ask_groq(
             "Please add it to Streamlit Secrets."
         )
 
+    context_parts = []
+
+    for item in retrieved_chunks:
+
+        context_parts.append(
+            f"[Page {item['page']}]\n"
+            f"{item['text']}"
+        )
+
     context = "\n\n".join(
-        [
-            f"[Page {item['page']}]\n{item['text']}"
-            for item in retrieved_chunks
-        ]
+        context_parts
     )
 
     system_prompt = """
@@ -662,14 +709,18 @@ Answer the user's question using ONLY
 the HR policy context provided.
 
 Rules:
-- Do not invent policies.
-- Do not use outside information.
-- If the answer is not found in the context,
-  say that the uploaded policy does not contain
-  enough information.
-- Keep the response clear and professional.
-- Mention the relevant page when possible.
-- Do not provide legal advice.
+
+1. Do not invent HR policies.
+2. Do not use outside information.
+3. If the answer is not found in the
+   provided context, clearly say that the
+   uploaded policy does not contain enough
+   information to answer the question.
+4. Keep the answer clear and professional.
+5. Mention the relevant policy page when
+   possible.
+6. Do not make assumptions.
+7. Do not provide legal advice.
 """
 
     user_prompt = f"""
@@ -681,7 +732,7 @@ USER QUESTION:
 
 {question}
 
-Answer using only the provided policy context.
+Answer using only the provided HR policy context.
 """
 
     response = client.chat.completions.create(
@@ -699,7 +750,10 @@ Answer using only the provided policy context.
         temperature=0.1,
     )
 
-    return response.choices[0].message.content
+    return (
+        response.choices[0]
+        .message.content
+    )
 
 
 # =========================================================
@@ -751,54 +805,61 @@ with st.sidebar:
         """
         <div class="pipeline-card">
 
-            <div style="
-                font-size:17px;
-                font-weight:800;
-                color:#172033;
-                margin-bottom:12px;
-            ">
+            <div class="pipeline-heading">
                 🔎 RAG Pipeline
             </div>
 
             <div class="pipeline-step">
-                <span class="pipeline-number">01</span>
+                <span class="pipeline-number">
+                    01
+                </span>
                 <span class="pipeline-text">
-                    &nbsp; PDF Upload
+                    PDF Upload
                 </span>
             </div>
 
             <div class="pipeline-step">
-                <span class="pipeline-number">02</span>
+                <span class="pipeline-number">
+                    02
+                </span>
                 <span class="pipeline-text">
-                    &nbsp; PyMuPDF Extraction
+                    PyMuPDF Extraction
                 </span>
             </div>
 
             <div class="pipeline-step">
-                <span class="pipeline-number">03</span>
+                <span class="pipeline-number">
+                    03
+                </span>
                 <span class="pipeline-text">
-                    &nbsp; Text Chunking
+                    Text Chunking
                 </span>
             </div>
 
             <div class="pipeline-step">
-                <span class="pipeline-number">04</span>
+                <span class="pipeline-number">
+                    04
+                </span>
                 <span class="pipeline-text">
-                    &nbsp; Sentence Transformers
+                    Sentence Transformers
                 </span>
             </div>
 
             <div class="pipeline-step">
-                <span class="pipeline-number">05</span>
+                <span class="pipeline-number">
+                    05
+                </span>
                 <span class="pipeline-text">
-                    &nbsp; FAISS Retrieval
+                    FAISS Retrieval
                 </span>
             </div>
 
             <div class="pipeline-step">
-                <span class="pipeline-number">06</span>
+                <span class="pipeline-number">
+                    06
+                </span>
                 <span class="pipeline-text">
-                    &nbsp; Groq Generation
+                    Groq Generation
                 </span>
             </div>
 
@@ -862,7 +923,7 @@ st.markdown(
 
 
 # =========================================================
-# PROCESS PDF
+# PROCESS UPLOADED PDF
 # =========================================================
 
 if uploaded_file is not None:
@@ -887,8 +948,8 @@ if uploaded_file is not None:
         if not pages:
 
             st.error(
-                "No readable text was found in "
-                "this PDF. Please upload a "
+                "No readable text was found "
+                "in this PDF. Please upload a "
                 "text-based PDF."
             )
 
@@ -906,7 +967,9 @@ if uploaded_file is not None:
             "🧠 Building FAISS search index..."
         ):
 
-            model = load_embedding_model()
+            model = (
+                load_embedding_model()
+            )
 
             index = create_faiss_index(
                 chunks,
@@ -914,10 +977,13 @@ if uploaded_file is not None:
             )
 
         st.session_state.chunks = chunks
+
         st.session_state.index = index
+
         st.session_state.document_name = (
             uploaded_file.name
         )
+
         st.session_state.messages = []
 
         st.success(
@@ -926,7 +992,7 @@ if uploaded_file is not None:
 
 
 # =========================================================
-# DOCUMENT READY
+# DOCUMENT STATISTICS
 # =========================================================
 
 if st.session_state.index is not None:
@@ -939,7 +1005,9 @@ if st.session_state.index is not None:
             f"""
             <div class="stat-card">
 
-                <div class="stat-icon">📄</div>
+                <div class="stat-icon">
+                    📄
+                </div>
 
                 <div class="stat-value">
                     {len(st.session_state.chunks)}
@@ -960,7 +1028,9 @@ if st.session_state.index is not None:
             """
             <div class="stat-card">
 
-                <div class="stat-icon">🔎</div>
+                <div class="stat-icon">
+                    🔎
+                </div>
 
                 <div class="stat-value">
                     FAISS
@@ -981,7 +1051,9 @@ if st.session_state.index is not None:
             """
             <div class="stat-card">
 
-                <div class="stat-icon">🤖</div>
+                <div class="stat-icon">
+                    🤖
+                </div>
 
                 <div class="stat-value">
                     RAG
@@ -1065,7 +1137,9 @@ else:
 
             try:
 
-                model = load_embedding_model()
+                model = (
+                    load_embedding_model()
+                )
 
                 with st.spinner(
                     "🔎 Searching policy..."
@@ -1090,9 +1164,9 @@ else:
                         retrieved_chunks
                     )
 
-                # -----------------------------------------
+                # =========================================
                 # ANSWER
-                # -----------------------------------------
+                # =========================================
 
                 st.markdown(
                     """
@@ -1102,24 +1176,16 @@ else:
                             🤖 AI Answer
                         </div>
 
-                        <div class="answer-text">
+                    </div>
                     """,
                     unsafe_allow_html=True,
                 )
 
                 st.markdown(answer)
 
-                st.markdown(
-                    """
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-
-                # -----------------------------------------
+                # =========================================
                 # SOURCES
-                # -----------------------------------------
+                # =========================================
 
                 st.markdown(
                     """
